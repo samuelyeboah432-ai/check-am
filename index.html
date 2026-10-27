@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>Check Am</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..48,600;12..48,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one working tool column: paste box, then verdict card; explainer strip below */
+:root{
+  --bg:#F2F4F1; --surface:#FFFFFF; --ink:#102018; --muted:#56635B; --line:#D6DDD7;
+  --brand:#0F6B47; --brand-ink:#FFFFFF;
+  --high:#C2361F; --high-soft:#FBE7E2; --mid:#B87A0B; --mid-soft:#FBF0D9; --low:#2E7D4F; --low-soft:#E3F2E8;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Plus Jakarta Sans",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1512; --surface:#16211C; --ink:#E6EEE9; --muted:#9BAAA1; --line:#2A3832;
+  --brand:#3DBE86; --brand-ink:#0B1A13;
+  --high:#FF7A62; --high-soft:#3A1E19; --mid:#F0B44A; --mid-soft:#352A14; --low:#5FCB8C; --low-soft:#16301F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1512; --surface:#16211C; --ink:#E6EEE9; --muted:#9BAAA1; --line:#2A3832;
+  --brand:#3DBE86; --brand-ink:#0B1A13;
+  --high:#FF7A62; --high-soft:#3A1E19; --mid:#F0B44A; --mid-soft:#352A14; --low:#5FCB8C; --low-soft:#16301F; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.wrap{max-width:720px;margin:0 auto}
+header{padding-block:28px 8px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:-.02em}
+.logo span{color:var(--brand)}
+.demo-tag{font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(30px,6vw,44px);line-height:1.08;letter-spacing:-.02em;margin:22px 0 10px;text-wrap:balance}
+.sub{color:var(--muted);margin:0 0 24px;max-width:56ch}
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+label{font-weight:600;font-size:14px;display:block;margin-bottom:8px}
+textarea{width:100%;min-height:130px;resize:vertical;font:15px/1.5 var(--body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+textarea:focus{outline:2px solid var(--brand);outline-offset:1px}
+.samples{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 16px}
+.chip{font:500 13px var(--body);padding:6px 11px;border-radius:999px;border:1px dashed var(--line);background:transparent;color:var(--muted);cursor:pointer}
+.chip:hover{border-color:var(--brand);color:var(--ink)}
+.go{font:700 15px var(--body);padding:12px 20px;border-radius:10px;border:0;background:var(--brand);color:var(--brand-ink);cursor:pointer;width:100%}
+button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.verdict{margin-top:18px;border-radius:14px;padding:20px;border:1px solid var(--line);background:var(--surface)}
+.verdict.high{background:var(--high-soft);border-color:var(--high)}
+.verdict.mid{background:var(--mid-soft);border-color:var(--mid)}
+.verdict.low{background:var(--low-soft);border-color:var(--low)}
+.vhead{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.vlevel{font-family:var(--display);font-weight:800;font-size:28px;line-height:1.1}
+.high .vlevel{color:var(--high)} .mid .vlevel{color:var(--mid)} .low .vlevel{color:var(--low)}
+.score{text-align:right}
+.score b{font-family:var(--display);font-size:34px;font-variant-numeric:tabular-nums}
+.score small{display:block;font-size:12px;color:var(--muted)}
+.meter{height:8px;border-radius:99px;background:var(--line);margin:14px 0 4px;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:99px;background:currentColor}
+.high .meter{color:var(--high)} .mid .meter{color:var(--mid)} .low .meter{color:var(--low)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tag{font-size:12px;font-weight:700;padding:4px 9px;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
+.vsec{margin-top:16px}
+.vsec h3{font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.vsec ul{margin:0;padding-left:18px}
+.vsec li+li{margin-top:4px}
+.caution{font-size:13px;color:var(--muted);margin:14px 0 0}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px}
+.how>div{min-width:0}
+.how h3{font-family:var(--display);font-size:17px;margin:0 0 4px}
+.how p{margin:0;color:var(--muted);font-size:14px}
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media (max-width:620px){.how{grid-template-columns:1fr}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="logo">Check<span>Am</span></div>
+    <span class="demo-tag">Prototype demo</span>
+  </header>
+
+  <h1>Is this message a scam? Check am before you send money.</h1>
+  <p class="sub">Paste a suspicious SMS, WhatsApp message or investment offer. You get a risk level, the scam type and the exact warning signs, in plain language.</p>
+
+  <div class="tool">
+    <label for="msg">Message or offer</label>
+    <textarea id="msg" placeholder="Paste the message here"></textarea>
+    <div class="samples" aria-label="Sample messages">
+      <button class="chip" type="button" data-s="0">MoMo reversal</button>
+      <button class="chip" type="button" data-s="1">Fake promo win</button>
+      <button class="chip" type="button" data-s="2">Double your money</button>
+      <button class="chip" type="button" data-s="3">Job with a fee</button>
+      <button class="chip" type="button" data-s="4">Normal message</button>
+    </div>
+    <button class="go" id="go" type="button">Check am</button>
+  </div>
+
+  <div id="out" aria-live="polite"></div>
+
+  <div class="how">
+    <div><h3>Names the scam</h3><p>Reversal, fake promo, Ponzi, fake job and phishing patterns common in Ghana.</p></div>
+    <div><h3>Shows the red flags</h3><p>Every verdict points to the words that raised the alarm, so you learn the pattern.</p></div>
+    <div><h3>Never says “100% safe”</h3><p>Even a low score keeps a caution. A false “safe” is how people lose money.</p></div>
+  </div>
+
+  <footer>Prototype by Samuel Kwame Yeboah. This demo uses a rule-based pattern library. The full product adds AI analysis and a community scam-report database, and offers a screening API to fintechs and MFIs.</footer>
+</div>
+
+<script>
+var SAMPLES=[
+ "Hello, I mistakenly sent GHS 450 to your MoMo number. Please kindly reverse it to 0244xxxxxx urgently, my child is in hospital. God bless you.",
+ "CONGRATULATIONS! Your number has WON GHS 5,000 in the MTN Anniversary Promo. To claim, send GHS 50 processing fee and your MoMo PIN to our agent today. Offer expires in 24 hours.",
+ "Join our investment club and double your money in 7 days! Guaranteed 30% weekly returns. Invest GHS 500 and receive GHS 1,000. Bring 3 people and earn bonus. Limited slots, act now: bit.ly/cashwin",
+ "Shell Ghana is recruiting! Salary GHS 6,000/month, no experience needed. Pay GHS 200 registration fee to secure your interview slot. WhatsApp HR now.",
+ "Hi, are we still meeting at Accra Mall at 4pm? I'll bring the documents for the project."
+];
+var RULES=[
+ {type:"MoMo reversal",w:30,re:/(mistakenly|by mistake|wrongly) sent|sent .* (by mistake|wrongly)|revers(e|al)|send it back/i,flag:"Says money was sent to you by mistake and asks you to send it back. Check your actual MoMo balance, not the SMS."},
+ {type:"Fake promo",w:28,re:/\b(won|winner|congratulations|promo|lucky draw|selected)\b/i,flag:"Claims you have won a prize you did not enter."},
+ {type:"Fee to receive",w:28,re:/(processing|registration|clearance|activation|delivery) fee|pay .* to (claim|secure|receive)|send .* to claim/i,flag:"Asks you to pay a fee before you receive money or a job. Real prizes and employers do not charge you."},
+ {type:"Phishing",w:35,re:/\bPIN\b|\bOTP\b|verification code|password|verify your (account|wallet)/i,flag:"Asks for your PIN, OTP or password. No bank, telco or agent will ever ask for these."},
+ {type:"Ponzi / investment",w:30,re:/double your money|guaranteed|\d+\s?% (daily|weekly|monthly)|returns? (daily|weekly)|bring \d+ people|referral bonus|investment club/i,flag:"Promises guaranteed or very high returns. Real investments carry risk and never guarantee doubling."},
+ {type:"Fake job",w:18,re:/recruit|hiring|vacanc|no experience needed|salary/i,flag:"Job offer with unusually easy terms."},
+ {type:"Pressure",w:12,re:/urgent|urgently|act now|today only|expires|within 24 ?hours|limited slots|immediately/i,flag:"Creates time pressure so you act before you think."},
+ {type:"Emotional appeal",w:8,re:/hospital|god bless|please help|my child|emergency/i,flag:"Uses an emotional story to make you comply quickly."},
+ {type:"Suspicious link",w:14,re:/bit\.ly|tinyurl|wa\.me|https?:\/\/(?!www\.(mtn|telecel|bog)\.)/i,flag:"Contains a shortened or unofficial link. Do not tap it."},
+ {type:"Brand impersonation",w:8,re:/\b(MTN|Telecel|AirtelTigo|Bank of Ghana|BoG|Shell|GCB|Ecobank)\b/i,flag:"Uses a well-known brand name. Confirm through the company's official line, not the number that messaged you."}
+];
+var ACTIONS={
+ high:["Do not send money, a PIN or an OTP.","Block the number and report it to your network's fraud line.","Warn others: forward this result to your WhatsApp groups."],
+ mid:["Pause before you act. Verify through an official phone number or office.","Do not share personal or MoMo details yet."],
+ low:["No strong scam pattern found, but stay alert.","If money or personal details come up later, check again."]
+};
+function esc(s){return s.replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function analyse(text){
+  var hits=RULES.filter(function(r){return r.re.test(text)});
+  var score=hits.reduce(function(a,r){return a+r.w},0);
+  if(hits.length>=3)score+=10;
+  score=Math.min(97,Math.max(4,score));
+  var level=score>=60?"high":score>=30?"mid":"low";
+  return {hits:hits,score:score,level:level};
+}
+function render(){
+  var text=document.getElementById('msg').value.trim(), out=document.getElementById('out');
+  if(!text){out.innerHTML='<div class="verdict"><p style="margin:0">Paste a message first, or tap a sample above.</p></div>';return}
+  var r=analyse(text);
+  var names={high:"High risk: likely a scam",mid:"Be careful",low:"Low risk"};
+  var tags=r.hits.filter(function(h){return h.type!=="Pressure"&&h.type!=="Emotional appeal"&&h.type!=="Brand impersonation"&&h.type!=="Suspicious link"}).map(function(h){return'<span class="tag">'+esc(h.type)+'</span>'}).join('');
+  var flags=r.hits.length?r.hits.map(function(h){return'<li>'+esc(h.flag)+'</li>'}).join(''):'<li>No known scam phrases found in this text.</li>';
+  out.innerHTML='<div class="verdict '+r.level+'"><div class="vhead"><div class="vlevel">'+names[r.level]+'</div><div class="score"><b>'+r.score+'</b><small>scam score / 100</small></div></div>'+
+   '<div class="meter"><i style="width:'+r.score+'%"></i></div>'+(tags?'<div class="tags">'+tags+'</div>':'')+
+   '<div class="vsec"><h3>Red flags</h3><ul>'+flags+'</ul></div>'+
+   '<div class="vsec"><h3>What to do</h3><ul>'+ACTIONS[r.level].map(function(a){return'<li>'+a+'</li>'}).join('')+'</ul></div>'+
+   '<p class="caution">Check Am warns, it never guarantees. When in doubt, verify through an official channel.</p></div>';
+}
+document.querySelectorAll('.chip').forEach(function(b){b.addEventListener('click',function(){document.getElementById('msg').value=SAMPLES[+b.dataset.s];render()})});
+document.getElementById('go').addEventListener('click',render);
+document.getElementById('msg').value=SAMPLES[0];render();
+</script>
+
+</body>
+</html>
